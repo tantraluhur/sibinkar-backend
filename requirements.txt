@@ -1,0 +1,16 @@
+annotated-types==0.5.0
+asgiref==3.7.2
+Django==3.2.20
+django-cors-headers==3.12.0
+django-environ==0.8.1
+django-extensions==3.1.5
+djangorestframework==3.13.1
+djangorestframework-simplejwt==5.2.0
+gunicorn==20.1.0
+psycopg2==2.9.9
+pydantic==2.3.0
+pydantic_core==2.6.3
+PyJWT==2.8.0
+pytz==2023.3.post1
+sqlparse==0.4.4
+typing_extensions==4.8.0
