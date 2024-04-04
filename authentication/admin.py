@@ -6,21 +6,19 @@ from authentication.models import AuthUser
 
 class CustomUserAdmin(UserAdmin):
     model = AuthUser
-    list_display = ('phone_number', 'is_staff', 'is_active', 'name', 'email')
-    list_filter = ('phone_number', 'is_staff', 'is_active',)
+    list_display = ('username','is_staff', 'is_active', 'email')
+    list_filter = ('is_staff', 'is_active',)
     fieldsets = (
-        (None, {'fields': ('phone_number', 'email', 'name',)}),
+        (None, {'fields': ('email', 'username',)}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('phone_number', 'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('username', 'password1', 'password2', 'is_staff', 'is_active')}
          ),
     )
-    search_fields = ('phone_number',)
-    ordering = ('phone_number',)
-
+    search_fields = ('username',)
 
 admin.site.register(AuthUser, CustomUserAdmin)
 

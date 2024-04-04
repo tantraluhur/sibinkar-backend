@@ -5,8 +5,6 @@ from pydantic import BaseModel
 from rest_framework.exceptions import APIException
 from django.utils.functional import Promise
 
-from applibs.response import prepare_error_response
-
 class APIErrorData(BaseModel) :
     detail: Union[str, Promise]
     code: Optional[str] = None
