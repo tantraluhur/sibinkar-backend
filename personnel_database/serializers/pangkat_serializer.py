@@ -4,4 +4,4 @@ from personnel_database.models.pangkat import Pangkat
 class PangkatSerializer(serializers.ModelSerializer) :
     class Meta:
         model = Pangkat
-        fields = '__all__'
+        fields = ['id', 'nama']

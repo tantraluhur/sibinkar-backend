@@ -5,30 +5,30 @@ from django.db import models
 from authentication.models.base import BaseModel
 from personnel_database.models.pangkat import Pangkat
 from personnel_database.models.posisi import Posisi
-from subsatker.models import SubSatKer
-from subdit.models import SubDit
+from personnel_database.models.subsatker import SubSatKer
+from personnel_database.models.subdit import SubDit
 
 class UserPersonil(BaseModel) :
 
-    class JenisKelamin(int, enum.Enum):
-        L = 1
-        P = 2
+    class JenisKelamin(str, enum.Enum):
+        L = "L"
+        P = "P"
 
         @classmethod
         def choices(cls):
             return [(item.value, item.name) for item in cls]
     
-    class Status(int, enum.Enum) :
-        AKTIF = 1
-        NON_AKTIF = 2
-        CUTI = 3
-        PENSIUN = 4
+    class Status(str, enum.Enum) :
+        AKTIF = "Aktif"
+        NON_AKTIF = "Non Aktif"
+        CUTI = "Cuti"
+        PENSIUN = "Pensiun"
 
         @classmethod
         def choices(cls):
             return [(item.value, item.name) for item in cls]
 
-    nomor = models.IntegerChoices(null=True, blank=True)
+    nomor = models.BigIntegerField(null=True, blank=True)
     nama = models.CharField(max_length=120)
     jenis_kelamin = models.CharField(max_length=12, choices=JenisKelamin.choices())
     nrp = models.BigIntegerField()
@@ -47,3 +47,6 @@ class UserPersonil(BaseModel) :
         anggota
     ]
     '''
+
+    def __str__(self) :
+        return self.nama
