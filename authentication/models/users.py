@@ -1,3 +1,4 @@
+import uuid
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.hashers import make_password
@@ -35,6 +36,7 @@ class UserManager(BaseUserManager):
 
 
 class AuthUser(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(_('email address'), null=True, blank=True)
     is_staff = models.BooleanField(default=False)

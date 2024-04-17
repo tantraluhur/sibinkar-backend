@@ -5,7 +5,7 @@ class UserPersonilSerializer(serializers.ModelSerializer) :
     pangkat = serializers.CharField(source="pangkat.nama")
     subsatker = serializers.CharField(source="subsatker.nama")
     subdit = serializers.CharField(source="subdit.nama")
-    posisi = serializers.CharField(source="posisi.nama")
+    jabatan = serializers.CharField(source="jabatan.nama")
     class Meta:
         model = UserPersonil
         exclude = ['nomor', 'created_at', 'updated_at']

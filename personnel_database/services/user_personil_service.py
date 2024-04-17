@@ -12,10 +12,10 @@ class UserPersonilService(ABC):
         pangkat = data.pop('pangkat')
         subsatker = data.pop('subsatker')
         subdit = data.pop('subdit')
-        posisi = data.pop('posisi')
+        jabatan = data.pop('jabatan')
 
         personil = UserPersonil.objects.create(**data, pangkat_id = pangkat, subsatker_id = subsatker, 
-                                               subdit_id=subdit, posisi_id = posisi)
+                                               subdit_id=subdit, jabatan_id = jabatan)
         return personil
     
     @classmethod
@@ -25,7 +25,6 @@ class UserPersonilService(ABC):
         if(not personil) :
             raise NotFoundException(f"Personil with id {personil_id} not exists.")
 
-        personil.delete()
         return personil
     
     @classmethod
@@ -45,16 +44,16 @@ class UserPersonilService(ABC):
         filter_subdit= request.GET.get("subdit", None)
 
         if filter_jabatan:
-            query |= Q(jabatan__nama=filter_jabatan)
+            query |= Q(jabatan_id=filter_jabatan) if filter_jabatan.isdigit() else Q(jabatan__nama=filter_jabatan)
 
         if filter_pangkat:
-            query |= Q(pangkat__nama=filter_pangkat)
+            query |= Q(pangkat_id=filter_pangkat) if filter_pangkat.isdigit() else Q(pangkat__nama=filter_pangkat)
 
         if filter_subsatker:
-            query |= Q(subsatker__nama=filter_subsatker)
+            query |= Q(subsatker_id=filter_subsatker) if filter_subsatker.isdigit() else Q(subsatker__nama=filter_subsatker)
 
         if filter_subdit :
-            query |= Q(subdit__nama=filter_subdit)
+            query |= Q(subdit_id=filter_subdit) if filter_subdit.isdigit() else Q(subdit__nama=filter_subdit)
 
         personil_list = UserPersonil.objects.filter(query)
         return personil_list
