@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from commons.applibs.response import prepare_success_response, prepare_error_response, serializer_error_response
 from commons.middlewares.exception import APIException
 
-from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer
+from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer, UserPersonilPaginationSerializer
 from personnel_database.services.user_personil_service import UserPersonilService
 
 class PersonilView(APIView) :
@@ -14,6 +14,7 @@ class PersonilView(APIView) :
     
     def __init__(self) :
         self.serializer = UserPersonilSerializer
+        self.user_serializer_pagination = UserPersonilPaginationSerializer
         self.service = UserPersonilService
 
     def post(self, request) :
@@ -32,7 +33,7 @@ class PersonilView(APIView) :
     
     def get(self, request) :
         personil_list = self.service.get_personil(request)
-        serializer = self.serializer(personil_list, many=True)
+        serializer = self.user_serializer_pagination(personil_list)
         return Response(prepare_success_response(serializer.data), status.HTTP_200_OK)
     
     def put(self, request, personil_id) :

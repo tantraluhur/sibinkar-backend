@@ -29,6 +29,14 @@ class UserPersonil(BaseModel) :
         def choices(cls):
             return [(item.value, item.name) for item in cls]
         
+    class BKO(str, enum.Enum) :
+        GASUS_MASUK = "Gasus masuk"
+        GASUM_MASUK = "Gasum masuk"
+
+        @classmethod
+        def choices(cls):
+            return [(item.value, item.name) for item in cls]
+        
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
     nomor = models.BigIntegerField(null=True, blank=True)
     nama = models.CharField(max_length=120)
@@ -38,6 +46,7 @@ class UserPersonil(BaseModel) :
     jabatan = models.ForeignKey(Jabatan, on_delete=models.CASCADE)
     subsatker = models.ForeignKey(SubSatKer, on_delete=models.CASCADE)
     subdit = models.ForeignKey(SubDit, on_delete=models.CASCADE)
+    bko = models.CharField(max_length=12, choices=BKO.choices())
     status = models.CharField(max_length=20, choices=Status.choices())
 
     def __str__(self) :

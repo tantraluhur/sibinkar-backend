@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from django.db.models import Q
 
 from commons.middlewares.exception import NotFoundException
+from commons.applibs.pagination import pagination
 
 from personnel_database.models.users import UserPersonil
 
@@ -42,6 +43,9 @@ class UserPersonilService(ABC):
         filter_pangkat = request.GET.get("pangkat", None)
         filter_subsatker = request.GET.get("subsatker", None)
         filter_subdit= request.GET.get("subdit", None)
+        
+        page = request.GET.get("page", 1)
+        limit = request.GET.get("limit", 8)
 
         if filter_jabatan:
             query |= Q(jabatan_id=filter_jabatan) if filter_jabatan.isdigit() else Q(jabatan__nama=filter_jabatan)
@@ -56,4 +60,5 @@ class UserPersonilService(ABC):
             query |= Q(subdit_id=filter_subdit) if filter_subdit.isdigit() else Q(subdit__nama=filter_subdit)
 
         personil_list = UserPersonil.objects.filter(query)
-        return personil_list
+        data = pagination(personil_list, limit, page)
+        return data

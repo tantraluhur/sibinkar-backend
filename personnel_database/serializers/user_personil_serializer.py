@@ -9,3 +9,15 @@ class UserPersonilSerializer(serializers.ModelSerializer) :
     class Meta:
         model = UserPersonil
         exclude = ['nomor', 'created_at', 'updated_at']
+
+class PaginationSerializer(serializers.Serializer) :
+    total_pages = serializers.CharField()
+    current_page = serializers.CharField()
+    limit = serializers.CharField()
+    total_item = serializers.CharField()
+    has_next = serializers.BooleanField()
+    has_previous = serializers.BooleanField()
+
+class UserPersonilPaginationSerializer(serializers.Serializer) :
+    result = UserPersonilSerializer(many=True)
+    meta = PaginationSerializer()
