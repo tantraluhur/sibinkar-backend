@@ -75,9 +75,14 @@ class UserPersonilService(ABC):
         
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=personnel-database.csv'
-
+        
         df.columns = df.columns.str.upper()
-        df.to_csv(path_or_buf=response, index=False, sep=';')
+        csv_content = df.to_csv(index=False, sep=';')
+        
+        response.write(csv_content)
+    
+        response.write('\n\n')
+        response.write('Export successful!')
 
         return response
 
