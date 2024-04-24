@@ -1,7 +1,13 @@
+import csv
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
+import pandas as pd
+
+from personnel_database.models.users import UserPersonil
 
 from commons.applibs.response import prepare_success_response, prepare_error_response, serializer_error_response
 from commons.middlewares.exception import APIException
@@ -58,3 +64,14 @@ class PersonilView(APIView) :
             return Response(prepare_error_response(str(e)), e.status_code)
         except Exception as e :
             return Response(prepare_error_response(str(e)), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class PersonilExport(APIView) :
+    permission_classes = [IsAuthenticated,]
+
+    def __init__(self) :
+        self.serializer = UserPersonilSerializer
+        self.service = UserPersonilService
+
+    def get(self, request) :
+        response = self.service.export_csv_file()
+        return response

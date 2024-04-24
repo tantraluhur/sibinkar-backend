@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 from django.db.models import Q
+from django.http import HttpResponse
+import pandas as pd
 
 from commons.middlewares.exception import NotFoundException
 from commons.applibs.pagination import pagination
 
 from personnel_database.models.users import UserPersonil
-
+from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer
 class UserPersonilService(ABC):
     
     @classmethod
@@ -62,3 +64,21 @@ class UserPersonilService(ABC):
         personil_list = UserPersonil.objects.filter(query)
         data = pagination(personil_list, limit, page)
         return data
+    
+    @classmethod
+    def export_csv_file(cls) :
+        personil_list = UserPersonil.objects.all()
+        col = [f.name for f in UserPersonil._meta.get_fields()[3:]]
+    
+        serializer_data = UserPersonilSerializer(personil_list, many=True).data
+        df = pd.DataFrame.from_records(serializer_data, columns=col)
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=personnel-database.csv'
+
+        df.columns = df.columns.str.upper()
+        df.to_csv(path_or_buf=response, index=False, sep=';')
+
+        return response
+
+    

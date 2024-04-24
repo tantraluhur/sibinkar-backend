@@ -38,7 +38,6 @@ class UserPersonil(BaseModel) :
             return [(item.value, item.name) for item in cls]
         
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
-    nomor = models.BigIntegerField(null=True, blank=True)
     nama = models.CharField(max_length=120)
     jenis_kelamin = models.CharField(max_length=12, choices=JenisKelamin.choices())
     nrp = models.BigIntegerField()

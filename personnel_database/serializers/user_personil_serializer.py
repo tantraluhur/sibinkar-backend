@@ -8,7 +8,7 @@ class UserPersonilSerializer(serializers.ModelSerializer) :
     jabatan = serializers.CharField(source="jabatan.nama")
     class Meta:
         model = UserPersonil
-        exclude = ['nomor', 'created_at', 'updated_at']
+        exclude = ['created_at', 'updated_at']
 
 class PaginationSerializer(serializers.Serializer) :
     total_pages = serializers.CharField()
