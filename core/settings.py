@@ -67,7 +67,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'authentication',
-    'personnel_database'
+    'personnel_database',
+    'staffing_status'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
