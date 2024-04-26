@@ -24,6 +24,6 @@ urlpatterns = [
     path('backend/admin', admin.site.urls),
     path('api/v1/auth/', include('authentication.urls')),
     path('api/v1/personil/', include('personnel_database.urls')),
+    path('api/v1/staffing-status/', include('staffing_status.urls')),
     url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
-
 ]

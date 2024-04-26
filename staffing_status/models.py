@@ -7,3 +7,6 @@ class StaffingStatus(models.Model) :
     pangkat = models.ForeignKey(Pangkat, on_delete=models.CASCADE)
     dsp = models.IntegerField()
     rill = models.IntegerField()
+
+    def __str__(self) :
+        return f"{self.pangkat.nama} ({self.pangkat.tipe}) - {self.subsatker.nama}"
