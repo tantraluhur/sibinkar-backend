@@ -32,6 +32,8 @@ class UserPersonil(BaseModel) :
     class BKO(str, enum.Enum) :
         GASUS_MASUK = "Gasus masuk"
         GASUM_MASUK = "Gasum masuk"
+        GASUS_KELUAR = "Gasus keluar"
+        GASUM_KELUAR = "Gasum keluar"
 
         @classmethod
         def choices(cls):
