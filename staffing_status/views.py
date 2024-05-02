@@ -31,3 +31,11 @@ class StaffingStatusView(APIView) :
             return Response(prepare_error_response(str(e)), e.status_code)
         except Exception as e :
             return Response(prepare_error_response(str(e)), status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        
+class StaffingStatusExport(APIView) :
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request) :
+        pass
+
+
