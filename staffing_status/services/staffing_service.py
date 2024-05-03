@@ -49,7 +49,6 @@ class StaffingService(ABC):
     def get_staffing_data(cls, tipe: str, subsatker:SubSatKer) :
         data = {
                 tipe: {
-                    "data": [],
                     "jumlah" : {
                         "dsp" : 0,
                         "rill" : 0
@@ -66,12 +65,11 @@ class StaffingService(ABC):
                 message = f"Subsatker {i.subsatker} dengan Pangkat {i.pangkat.nama} kelebihan {i.rill - i.dsp} personil"
   
             temp = {
-                "pangkat" : i.pangkat.nama,
                 "dsp" : i.dsp,
                 "rill" : i.rill,
                 "message" : message
             }
-            data[tipe]['data'].append(temp)
+            data[tipe][i.pangkat.nama] = temp
             data[tipe]['jumlah']['dsp'] = data[tipe]['jumlah']['dsp'] + i.dsp
             data[tipe]['jumlah']['rill'] = data[tipe]['jumlah']['rill'] + i.rill
 
