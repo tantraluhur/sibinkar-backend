@@ -1,6 +1,8 @@
-from abc import ABC, abstractmethod
-from django.db.models import Q
 from django.http import HttpResponse
+from django.db.models import Q
+from django.db import transaction
+from abc import ABC
+
 import pandas as pd
 
 from commons.middlewares.exception import NotFoundException
@@ -8,6 +10,8 @@ from commons.applibs.pagination import pagination
 
 from personnel_database.models.users import UserPersonil
 from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer
+from staffing_status.models import StaffingStatus
+
 class UserPersonilService(ABC):
     
     @classmethod
@@ -61,9 +65,19 @@ class UserPersonilService(ABC):
         if filter_subdit :
             query |= Q(subdit_id=filter_subdit) if filter_subdit.isdigit() else Q(subdit__nama=filter_subdit)
 
-        personil_list = UserPersonil.objects.filter(query)
+        personil_list = UserPersonil.objects.filter(query).order_by('updated_at')
         data = pagination(personil_list, limit, page)
         return data
+    
+    @classmethod
+    @transaction.atomic
+    def update_personil(cls, serializer, personil: UserPersonil) :
+        staffing_status = StaffingStatus.objects.filter(Q(pangkat=personil.pangkat) & Q(subsatker=personil.subsatker)).first()
+        staffing_status.rill = staffing_status.rill - 1
+        staffing_status.save()
+
+        serializer = serializer.save()
+        return serializer
     
     @classmethod
     def export_csv_file(cls) :

@@ -20,9 +20,9 @@ class StaffingService(ABC):
         
         for i in data :
             i = dict(i)
-            staffing_status = staffing_status_list.filter(pangkat__nama=i['pangkat']).first()
+            staffing_status = staffing_status_list.filter(Q(nama=i['pangkat']) | Q(pangkat__nama=i['pangkat'])).first()
             if(not staffing_status) :
-                raise BadRequestException(f"Pangkat {i['pangkat']} not exists in staffing status.")
+                raise BadRequestException(f"Pangkat {i['pangkat']} not exists in staffing status.")            
             cls.update_data(staffing_status, i['dsp'])
 
         return cls.get_staffing_status()
@@ -32,10 +32,14 @@ class StaffingService(ABC):
         data.dsp = dsp
         data.save()
 
+    @classmethod
+    def get_staffing(cls) :
+        data = []
 
     @classmethod
     def get_staffing_status(cls) :
         data = []
+
         satker_list = SubSatKer.objects.all()
         for i in satker_list :
             temp_polri = cls.get_staffing_data("POLRI", i)
@@ -56,20 +60,19 @@ class StaffingService(ABC):
                 }}
         
         staffing_status_list = StaffingStatus.objects.filter(Q(pangkat__tipe = tipe) & Q(subsatker=subsatker))
-
         for i in staffing_status_list :
             message = ""
             if(i.dsp > i.rill) :
-                message = f"Subsatker {i.subsatker} dengan Pangkat {i.pangkat.nama} kekurangan {i.dsp - i.rill} personil"
+                message = f"Subsatker {i.subsatker} dengan Pangkat {i.nama} kekurangan {i.dsp - i.rill} personil"
             elif(i.dsp < i.rill) :
-                message = f"Subsatker {i.subsatker} dengan Pangkat {i.pangkat.nama} kelebihan {i.rill - i.dsp} personil"
+                message = f"Subsatker {i.subsatker} dengan Pangkat {i.nama} kelebihan {i.rill - i.dsp} personil"
   
             temp = {
                 "dsp" : i.dsp,
                 "rill" : i.rill,
                 "message" : message
             }
-            data[tipe][i.pangkat.nama] = temp
+            data[tipe][i.nama] = temp
             data[tipe]['jumlah']['dsp'] = data[tipe]['jumlah']['dsp'] + i.dsp
             data[tipe]['jumlah']['rill'] = data[tipe]['jumlah']['rill'] + i.rill
 

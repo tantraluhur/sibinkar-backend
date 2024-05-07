@@ -12,7 +12,7 @@ class Pangkat(BaseModel) :
         def choices(cls):
             return [(item.value, item.name) for item in cls]    
 
-    nama = models.CharField(max_length=120)
+    nama = models.CharField(max_length=120, unique=True)
     tipe = models.CharField(max_length=120, choices=Tipe.choices(), default=Tipe.POLRI)
 
     def __str__(self) :

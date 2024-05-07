@@ -1,5 +1,12 @@
 from rest_framework import serializers
 from personnel_database.models.users import UserPersonil
+from staffing_status.models import StaffingStatus
+
+from commons.middlewares.exception import BadRequestException
+
+from django.db.models import Q
+from django.db import transaction
+
 
 class UserPersonilSerializer(serializers.ModelSerializer) :
     pangkat = serializers.CharField(source="pangkat.nama")
@@ -9,6 +16,15 @@ class UserPersonilSerializer(serializers.ModelSerializer) :
     class Meta:
         model = UserPersonil
         exclude = ['created_at', 'updated_at']
+    
+class UpdateUserPersonilSerializer(serializers.ModelSerializer) :
+    class Meta:
+        model = UserPersonil
+        exclude = ['created_at', 'updated_at']
+
+    def update(self, instance, validated_data) :    
+        return super().update(instance, validated_data)  
+
 
 class PaginationSerializer(serializers.Serializer) :
     total_pages = serializers.CharField()

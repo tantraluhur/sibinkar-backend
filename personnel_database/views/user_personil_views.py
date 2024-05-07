@@ -12,7 +12,7 @@ from personnel_database.models.users import UserPersonil
 from commons.applibs.response import prepare_success_response, prepare_error_response, serializer_error_response
 from commons.middlewares.exception import APIException
 
-from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer, UserPersonilPaginationSerializer
+from personnel_database.serializers.user_personil_serializer import UserPersonilSerializer, UserPersonilPaginationSerializer, UpdateUserPersonilSerializer
 from personnel_database.services.user_personil_service import UserPersonilService
 
 class PersonilView(APIView) :
@@ -20,6 +20,7 @@ class PersonilView(APIView) :
     
     def __init__(self) :
         self.serializer = UserPersonilSerializer
+        self.update_serialzer = UpdateUserPersonilSerializer
         self.user_serializer_pagination = UserPersonilPaginationSerializer
         self.service = UserPersonilService
 
@@ -45,11 +46,13 @@ class PersonilView(APIView) :
     def put(self, request, personil_id) :
         try :
             personil = self.service.get_personil_by_id(personil_id)
-            serializer = self.serializer(personil, data=request.data, partial=True)
+            serializer = self.update_serialzer(personil, data=request.data, partial=True)
             if(not serializer.is_valid()) :
                 return Response(serializer_error_response(serializer.errors), status.HTTP_400_BAD_REQUEST)
-            serializer.save()
-            return Response(prepare_success_response(serializer.data), status.HTTP_200_OK)
+            serializer = UserPersonilService.update_personil(serializer, personil)
+
+            serializer_data = self.serializer(serializer)
+            return Response(prepare_success_response(serializer_data.data), status.HTTP_200_OK)
         except APIException as e :
             return Response(prepare_error_response(str(e)), e.status_code)
         except Exception as e :
