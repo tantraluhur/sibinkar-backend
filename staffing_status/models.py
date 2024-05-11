@@ -3,7 +3,6 @@ from personnel_database.models.subsatker import SubSatKer
 from personnel_database.models.pangkat import Pangkat
 
 class StaffingStatus(models.Model) :
-    #nama == pangkat. Di data pangkat BRIGJEN POL, tapi di staffing status BRIGJEN
     nama = models.CharField(max_length=120)
     subsatker = models.ForeignKey(SubSatKer, on_delete=models.CASCADE)
     pangkat = models.ManyToManyField(Pangkat)
