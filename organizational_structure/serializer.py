@@ -2,6 +2,10 @@ from rest_framework import serializers
 
 from organizational_structure.models import Nodes, Chart
 
+class UpdateNodeSerializer(serializers.Serializer) :
+    nama = serializers.CharField(required=False)
+    jabatan = serializers.CharField(required=False)
+
 class CreateNodeSerializer(serializers.Serializer) :
     parent_id = serializers.IntegerField()
     nama = serializers.CharField()

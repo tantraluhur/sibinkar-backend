@@ -30,6 +30,18 @@ class OrganizationalStructureService(ABC):
     def get_all_chart_name(cls) :
         chart = Chart.objects.all()
         return chart
+    
+    @classmethod
+    def update_nodes(cls, nodes_id, **data) :
+        nodes = Nodes.objects.filter(id=nodes_id).first()
+
+        if(not nodes) :
+            raise BadRequestException(f"Nodes with id {nodes_id} not exists.")
+        
+        for key, value in data.items():
+            setattr(nodes, key, value)
+        nodes.save()
+        return nodes
 
     @classmethod
     @transaction.atomic
