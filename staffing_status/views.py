@@ -32,6 +32,16 @@ class StaffingStatusView(APIView) :
         except Exception as e :
             return Response(prepare_error_response(str(e)), status.HTTP_500_INTERNAL_SERVER_ERROR) 
         
+class StaffingStatusPangkatView(APIView) :
+    permission_classes = [IsAuthenticated,]
+
+    def __init__(self) :
+        self.service = StaffingService
+
+    def get(self, request) :
+        data = StaffingService.get_total_by_pangkat()
+        return Response(prepare_success_response(data), status.HTTP_200_OK)
+        
 class StaffingStatusExport(APIView) :
     permission_classes = [IsAuthenticated, ]
 

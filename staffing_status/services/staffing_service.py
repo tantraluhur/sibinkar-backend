@@ -33,10 +33,6 @@ class StaffingService(ABC):
         data.save()
 
     @classmethod
-    def get_staffing(cls) :
-        data = []
-
-    @classmethod
     def get_staffing_status(cls) :
         data = []
 
@@ -87,6 +83,24 @@ class StaffingService(ABC):
                 },
                 **polri, **pns_polri
         }
+        return data
+    
+    @classmethod
+    def get_total_by_pangkat(cls) :
+        data = {}
+
+        staffing_status_list = StaffingStatus.objects.all()
+
+        for i in staffing_status_list :
+            if(not data.get(i.nama, None)) :
+                data[i.nama] = {
+                    'dsp' : 0,
+                    'rill' : 0,
+                }
+            
+            data[i.nama]['dsp'] = data[i.nama]['dsp'] +  i.dsp
+            data[i.nama]['rill'] = data[i.nama]['rill'] + i.rill
+
         return data
 
  
