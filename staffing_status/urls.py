@@ -3,5 +3,5 @@ from staffing_status.views import StaffingStatusView, StaffingStatusPangkatView
 
 urlpatterns = [
     path('', StaffingStatusView.as_view()),
-    path('jumlah/', StaffingStatusPangkatView.as_view())
+    path('total/', StaffingStatusPangkatView.as_view())
 ]
