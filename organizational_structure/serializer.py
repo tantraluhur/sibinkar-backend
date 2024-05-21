@@ -6,6 +6,9 @@ class UpdateNodeSerializer(serializers.Serializer) :
     nama = serializers.CharField(required=False)
     jabatan = serializers.CharField(required=False)
 
+class DeleteNodeSerializer(serializers.Serializer) :
+    node_id = serializers.IntegerField()
+
 class CreateNodeSerializer(serializers.Serializer) :
     parent_id = serializers.IntegerField()
     nama = serializers.CharField()

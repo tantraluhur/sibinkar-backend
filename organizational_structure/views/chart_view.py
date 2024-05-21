@@ -42,6 +42,7 @@ class ChartDetailView(APIView) :
 
     def __init__(self) :
         self.serializer = ChartSerializer
+        self.chart_name_serializer = ChartNameSerializer
         self.service = OrganizationalStructureService 
 
     def get(self, request, id) :
@@ -53,4 +54,17 @@ class ChartDetailView(APIView) :
             return Response(prepare_error_response(str(e)), e.status_code)
         except Exception as e :
             return Response(prepare_error_response(str(e)), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, id) :
+        try :
+            chart = self.service.delete_chart(id)
+            serializer_data = self.chart_name_serializer(chart).data
+            return Response(prepare_success_response(serializer_data), status.HTTP_200_OK)
+        except APIException as e :
+            return Response(prepare_error_response(str(e)), e.status_code)
+        except Exception as e :
+            return Response(prepare_error_response(str(e)), status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+        
 
