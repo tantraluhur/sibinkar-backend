@@ -3,6 +3,8 @@ import pandas as pd
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Alignment
+from openpyxl.utils import get_column_letter
+from io import BytesIO
 
 
 from django.http import HttpResponse
@@ -14,6 +16,7 @@ from commons.middlewares.exception import BadRequestException
 
 from staffing_status.models import StaffingStatus
 from personnel_database.models.subsatker import SubSatKer
+from personnel_database.models.pangkat import Pangkat
 
 class StaffingService(ABC):
     
@@ -125,12 +128,20 @@ class StaffingService(ABC):
             ('POLRI', 'AKP DSP'), ('POLRI', 'AKP RIIL'),
             ('POLRI', 'IP DSP'), ('POLRI', 'IP RIIL'),
             ('POLRI', 'BRIG/TA DSP'), ('POLRI', 'BRIG/TA RIIL'),
-            ('POLRI', 'Jumlah'),
+            ('POLRI', 'Jumlah DSP'), ('POLRI', 'Jumlah RIIL'),
             ('PNS POLRI', 'IV DSP'), ('PNS POLRI', 'IV RIIL'),
             ('PNS POLRI', 'III DSP'), ('PNS POLRI', 'III RIIL'),
             ('PNS POLRI', 'II/I DSP'), ('PNS POLRI', 'II/I RIIL'),
-            ('PNS POLRI', 'Jumlah'), ('', 'Ket')
+            ('PNS POLRI', 'Jumlah DSP'), ('PNS POLRI', 'Jumlah RIIL'), ('', 'Ket')
         ], names=['', ''])
+
+        # columns = pd.MultiIndex.from_tuples([
+        #     ('', 'No'), ('', 'SatKer'),
+        #     ('POLRI', 'IRJEN DSP'), ('POLRI', 'IRJEN RIIL'),
+        #     ('POLRI', 'Jumlah'),
+        #     ('PNS POLRI', 'IV DSP'), ('PNS POLRI', 'IV RIIL'),
+        #     ('PNS POLRI', 'Jumlah'), ('', 'Ket')
+        # ], names=['', ''])
 
         # Define the data
         data = [
@@ -145,8 +156,45 @@ class StaffingService(ABC):
             [9, 'TAUD', 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 1, '...'],
         ]
 
+        
+        res = dict()
+        
+        for staffing_status_obj in StaffingStatus.objects.filter():
+            if staffing_status_obj.subsatker.nama not in res:
+                res[staffing_status_obj.subsatker.nama] = {}
+            
+            pangkat = staffing_status_obj.pangkat.all()
+            for pangkat_obj in pangkat:
+                tipe = pangkat_obj.tipe
+                if tipe not in res[staffing_status_obj.subsatker.nama]:
+                    res[staffing_status_obj.subsatker.nama][tipe] = {}
+                res[staffing_status_obj.subsatker.nama][tipe][staffing_status_obj.nama] = {'dsp':staffing_status_obj.dsp, 'riil':staffing_status_obj.rill}
+    
+
+        print(res)
         # Create the DataFrame
-        df = pd.DataFrame(data, columns=columns)
+        # df = pd.DataFrame(data, columns=columns)
+        df = pd.DataFrame(columns=columns)
+        for idx, (satker, levels) in enumerate(res.items(), start=1):
+            row = [idx, satker]
+            polri_data = []
+            pns_polri_data = []
+            for level in ['IRJEN', 'BRIGJEN', 'KOMBES', 'AKBP', 'KOMPOL', 'AKP', 'IP', 'BRIG/TA']:
+                if 'POLRI' in levels and level in levels['POLRI']:
+                    polri_data.extend([levels['POLRI'][level]['dsp'], levels['POLRI'][level]['riil']])
+                else:
+                    polri_data.extend([0, 0])
+            polri_data.extend([sum(polri_data[::2]), sum(polri_data[1::2])])
+            for level in ['IV', 'III', 'II/I']:
+                if 'PNS POLRI' in levels and level in levels['PNS POLRI']:
+                    pns_polri_data.extend([levels['PNS POLRI'][level]['dsp'], levels['PNS POLRI'][level]['riil']])
+                else:
+                    pns_polri_data.extend([0, 0])
+            pns_polri_data.extend([sum(pns_polri_data[::2]), sum(pns_polri_data[1::2])])
+            row.extend(polri_data)
+            row.extend(pns_polri_data)
+            row.append('...')
+            df.loc[len(df)] = row
 
         # Calculate totals
         totals = [
@@ -186,7 +234,7 @@ class StaffingService(ABC):
         # Adjust column widths
         for col in ws.columns:
             max_length = 0
-            column = col[0].column_letter  # Use a normal cell to get the column letter
+            column = get_column_letter(col[0].column)  # Use a normal cell to get the column letter
             for cell in col:
                 try:
                     if len(str(cell.value)) > max_length:
