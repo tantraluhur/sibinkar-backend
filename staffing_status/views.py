@@ -45,7 +45,10 @@ class StaffingStatusPangkatView(APIView) :
 class StaffingStatusExport(APIView) :
     permission_classes = [IsAuthenticated, ]
 
+    def __init__(self) :
+        self.service = StaffingService
+
     def get(self, request) :
-        pass
+        return self.service.export_csv_file()
 
 

@@ -27,6 +27,15 @@ class OrganizationalStructureService(ABC):
         return chart
     
     @classmethod
+    def delete_chart(cls, chart_id) :
+        chart = Chart.objects.filter(id=chart_id).first()
+        if(not chart) :
+            raise BadRequestException(f"Chart with id {chart_id} not exists.")
+        
+        chart.delete()
+        return chart
+    
+    @classmethod
     def get_all_chart_name(cls) :
         chart = Chart.objects.all()
         return chart
@@ -71,4 +80,17 @@ class OrganizationalStructureService(ABC):
         child_node = Nodes.objects.create(**data)
         parent_node.child_offsets.add(child_node)
 
-        return chart 
+        return chart
+    
+    @classmethod
+    def delete_node(cls, data, chart_id) :
+        nodes_id = data.get("node_id", None)
+        nodes = Nodes.objects.filter(id=nodes_id).first()
+        if(not nodes) :
+            raise BadRequestException(f"Node with id {nodes_id} not exists.")
+        
+        nodes.delete()
+        chart = cls.get_chart(chart_id)
+        return chart
+
+  
