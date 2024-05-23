@@ -96,7 +96,6 @@ class UserPersonilService(ABC):
         response.write(csv_content)
     
         response.write('\n\n')
-        response.write('Export successful!')
 
         return response
 

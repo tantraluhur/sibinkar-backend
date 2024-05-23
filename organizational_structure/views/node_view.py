@@ -20,7 +20,7 @@ class NodeView(APIView) :
 
     def put(self, request, id) :
         try :
-            serializer = self.delete_node_serializer(data=request.data)
+            serializer = self.node_serializer(data=request.data)
             if(not serializer.is_valid()) :
                 return Response(serializer_error_response(serializer.errors), status.HTTP_400_BAD_REQUEST)
             self.service.update_nodes(id, **serializer.data)
