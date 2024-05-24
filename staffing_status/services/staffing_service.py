@@ -316,12 +316,9 @@ class StaffingService(ABC):
             df.loc[len(df)] = row
 
         # Calculate totals
-        print(df.columns)
         totals = [
             ['Jumlah', ''] + [df.iloc[:, i].sum() for i in range(2, len(df.columns))]
         ]
-        print(df)
-        print(totals)
         # Convert totals to DataFrame
         totals_df = pd.DataFrame(totals, columns=columns)
         # Concatenate the totals row to the original DataFrame

@@ -43,7 +43,7 @@ class StaffingStatusPangkatView(APIView) :
         return Response(prepare_success_response(data), status.HTTP_200_OK)
         
 class StaffingStatusExport(APIView) :
-    # permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated, ]
 
     def __init__(self) :
         self.service = StaffingService
