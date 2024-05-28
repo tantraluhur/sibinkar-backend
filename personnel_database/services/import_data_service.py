@@ -8,6 +8,7 @@ from commons.middlewares.exception import BadRequestException
 from personnel_database.models.subdit import SubDit
 from personnel_database.models.subsatker import SubSatKer
 from personnel_database.models.pangkat import Pangkat
+from personnel_database.models.jabatan import Jabatan
 from staffing_status.models import StaffingStatus
 
 class ImportDataService(ABC):
@@ -29,6 +30,8 @@ class ImportDataService(ABC):
             cls.import_data_pangkat(spamreader)
         elif jenis == "staffing status" :
             cls.import_data_staffing_status(spamreader)
+        elif jenis == "jabatan" :
+            cls.import_data_jabatan(spamreader)
         else :
             raise BadRequestException(f"Jenis {jenis} not exists.")
 
@@ -55,6 +58,17 @@ class ImportDataService(ABC):
             subsatker_list.append(SubSatKer(nama=row['SUBSATKER']))
 
         SubSatKer.objects.bulk_create(subsatker_list, ignore_conflicts=True)
+
+    @classmethod
+    def import_data_jabatan(cls, spamreader) :
+        jabatan_list = []
+        for _, row in spamreader.iterrows() :
+            col = row.get("JABATAN", None)
+            if not col :
+                raise BadRequestException("Missing Column JABATAN")
+            jabatan_list.append(Jabatan(nama=row['JABATAN']))
+
+        Jabatan.objects.bulk_create(jabatan_list, ignore_conflicts=True)        
 
     @classmethod
     def import_data_pangkat(cls, spamreader) :
@@ -109,6 +123,7 @@ class ImportDataService(ABC):
 
         StaffingStatus.objects.bulk_create(staffing_status_list, ignore_conflicts=True)
         staffing_status_list = StaffingStatus.objects.all()
+
         for i in staffing_status_list : 
             staffing_pangkat = staffing_pangkat_dict.get(i.nama, None)
             if(not staffing_pangkat) :
