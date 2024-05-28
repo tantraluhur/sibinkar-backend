@@ -16,7 +16,7 @@ class ImportDataService(ABC):
     @classmethod
     def import_data(cls, file, jenis) :
         if(jenis == None) :
-            raise BadRequestException("Please insert type of data (subdit, subsatker, pangkat, staffing status) in query parameter")
+            raise BadRequestException("Please insert type of data (subdit, jabatan, subsatker, pangkat, staffing status) in query parameter")
 
         if(file.content_type != "text/csv") :
             raise BadRequestException("Please insert csv file.")
