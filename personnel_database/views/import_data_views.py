@@ -18,14 +18,13 @@ class ImportDataView(APIView) :
         self.serializer = ImportDataSerializer
 
     def post(self, request) :
-        jenis = request.query_params.get('jenis', None)
+        jenis = request.query_params.get('type', None)
         try :
             serializer = self.serializer(data=request.data)
             if(not serializer.is_valid()) :
                 return Response(serializer_error_response(serializer.errors), status.HTTP_400_BAD_REQUEST)
-            
-            self.service.import_data(serializer.data, jenis)
-            return Response(prepare_success_response("Success insert data."), status.HTTP_201_CREATED)
+            response = self.service.import_data(serializer.validated_data['file'], jenis)
+            return Response(prepare_success_response(response), status.HTTP_201_CREATED)
         
         except APIException as e :
             return Response(prepare_error_response(str(e)), e.status_code)

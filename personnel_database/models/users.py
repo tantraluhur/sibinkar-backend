@@ -1,6 +1,7 @@
 import enum
 import uuid
 
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models import Q
 
@@ -47,7 +48,7 @@ class UserPersonil(BaseModel) :
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
     nama = models.CharField(max_length=120)
     jenis_kelamin = models.CharField(max_length=12, choices=JenisKelamin.choices())
-    nrp = models.BigIntegerField()
+    nrp = models.IntegerField(validators=[MaxValueValidator(99999999)])
     pangkat = models.ForeignKey(Pangkat, on_delete=models.CASCADE)
     jabatan = models.ForeignKey(Jabatan, on_delete=models.CASCADE)
     subsatker = models.ForeignKey(SubSatKer, on_delete=models.CASCADE)

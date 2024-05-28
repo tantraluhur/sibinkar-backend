@@ -1,4 +1,5 @@
 import pandas as pd
+from django.db.models import Case, When, Subquery, OuterRef, CharField, Value
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -67,7 +68,7 @@ class StaffingService(ABC):
                     }
                 }}
         
-        staffing_status_list = StaffingStatus.objects.filter(Q(pangkat__tipe = tipe) & Q(subsatker=subsatker))
+        staffing_status_list = StaffingStatus.objects.filter(Q(pangkat__tipe = tipe) & Q(subsatker=subsatker)).distinct()
         for i in staffing_status_list :
             message = ""
             if(i.dsp > i.rill) :
@@ -99,9 +100,28 @@ class StaffingService(ABC):
     
     @classmethod
     def get_total_by_pangkat(cls) :
-        data = {}
+        data = {
+            "POLRI" : {
+                "dsp": 0,
+                "rill": 0
+            },
+            "PNS POLRI" : {
+                "dsp" : 0,
+                "rill" : 0
+            },
+            "Keterangan" : {
+                "dsp" : 0,
+                "rill" : 0,
+            }
+        }
 
-        staffing_status_list = StaffingStatus.objects.all()
+        staffing_status_list = StaffingStatus.objects.all().distinct().annotate(
+                tipe=Case(
+                When(pangkat__tipe='PNS POLRI', then=Value("PNS POLRI")),
+                default=Value("POLRI"),
+                output_field=CharField(),
+                )
+        )
 
         for i in staffing_status_list :
             if(not data.get(i.nama, None)) :
@@ -109,9 +129,15 @@ class StaffingService(ABC):
                     'dsp' : 0,
                     'rill' : 0,
                 }
-            
+
             data[i.nama]['dsp'] = data[i.nama]['dsp'] +  i.dsp
             data[i.nama]['rill'] = data[i.nama]['rill'] + i.rill
+
+            data[i.tipe]['dsp'] = data[i.tipe]['dsp'] + i.dsp
+            data[i.tipe]['rill'] = data[i.tipe]['rill'] + i.rill
+
+            data['Keterangan']['dsp'] = data['Keterangan']['dsp'] + i.dsp
+            data['Keterangan']['rill'] = data['Keterangan']['rill'] + i.rill
 
         return data
     

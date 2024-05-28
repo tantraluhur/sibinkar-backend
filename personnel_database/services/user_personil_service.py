@@ -81,7 +81,7 @@ class UserPersonilService(ABC):
     
     @classmethod
     def export_csv_file(cls) :
-        personil_list = UserPersonil.objects.all()
+        personil_list = UserPersonil.objects.all().order_by("pangkat")
         col = [f.name for f in UserPersonil._meta.get_fields()[3:]]
     
         serializer_data = UserPersonilSerializer(personil_list, many=True).data
