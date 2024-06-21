@@ -3,16 +3,14 @@ from rest_framework import serializers
 from organizational_structure.models import Nodes, Chart
 
 class UpdateNodeSerializer(serializers.Serializer) :
-    nama = serializers.CharField(required=False)
-    jabatan = serializers.CharField(required=False)
+    personnel_id = serializers.CharField()
 
 class DeleteNodeSerializer(serializers.Serializer) :
     node_id = serializers.IntegerField()
 
 class CreateNodeSerializer(serializers.Serializer) :
     parent_id = serializers.IntegerField()
-    nama = serializers.CharField()
-    jabatan = serializers.CharField()
+    personnel_id = serializers.CharField()
     offset = serializers.BooleanField()
 
 class RecursiveSerializer(serializers.Serializer):
@@ -20,8 +18,13 @@ class RecursiveSerializer(serializers.Serializer):
         serializer = self.parent.parent.__class__(value, context=self.context)
         return serializer.data
 
+class PersonnelSerializer(serializers.Serializer) :
+    id = serializers.CharField()
+    nama = serializers.CharField()
+    jabatan = serializers.CharField()
 
 class NodeSerializer(serializers.ModelSerializer) :
+    personnel = PersonnelSerializer()
     child = RecursiveSerializer(many=True, read_only=True)
     child_offsets = RecursiveSerializer(many=True, read_only=True)
     class Meta:
@@ -42,5 +45,4 @@ class ChartNameSerializer(serializers.ModelSerializer) :
 
 class CreateChartSerializer(serializers.Serializer) :
     nama_chart = serializers.CharField()
-    nama = serializers.CharField()
-    jabatan = serializers.CharField()
+    personnel_id = serializers.CharField()

@@ -6,8 +6,7 @@ from authentication.models.base import BaseModel
 from personnel_database.models.users import UserPersonil
 
 class Nodes(BaseModel) :
-    nama = models.CharField(max_length=120)
-    jabatan = models.CharField(max_length=120)
+    personnel = models.ForeignKey(UserPersonil, on_delete=models.CASCADE, null=True)
     offset = models.BooleanField(default=False)
     child = models.ManyToManyField("self", symmetrical=False, related_name="child_list", blank=True)
     child_offsets = models.ManyToManyField("self", symmetrical=False, related_name="child_offsets_list", blank=True)

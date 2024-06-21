@@ -1,5 +1,5 @@
 import pandas as pd
-from django.db.models import Case, When, Subquery, OuterRef, CharField, Value
+from django.db.models import Case, When, CharField, Value
 
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
@@ -17,7 +17,19 @@ from commons.middlewares.exception import BadRequestException
 
 from staffing_status.models import StaffingStatus
 from personnel_database.models.subsatker import SubSatKer
-from personnel_database.models.pangkat import Pangkat
+
+CUSTOM_ORDER = [
+    "PIMPINAN",
+    "DIT KAMSEL",
+    "DIT GAKKUM",
+    "DIT REGIDENT",
+    "BAG OPS",
+    "BAG RENMIN",
+    "BAG TIK",
+    "SIKEU",
+    "TAUD"
+]
+ORDER_DICT = {name: i for i, name in enumerate(CUSTOM_ORDER)}
 
 class StaffingService(ABC):
     
@@ -49,7 +61,7 @@ class StaffingService(ABC):
     def get_staffing_status(cls) :
         data = []
 
-        satker_list = SubSatKer.objects.all()
+        satker_list = sorted(SubSatKer.objects.all(), key=lambda x: ORDER_DICT.get(x.nama, len(CUSTOM_ORDER)))
         for i in satker_list :
             temp_polri = cls.get_staffing_data("POLRI", i)
             temp_pns_polri = cls.get_staffing_data("PNS POLRI", i)
@@ -164,7 +176,7 @@ class StaffingService(ABC):
         ], names=['', ''])
          
         res = dict()
-        
+
         for staffing_status_obj in StaffingStatus.objects.filter():
             if staffing_status_obj.subsatker.nama not in res:
                 res[staffing_status_obj.subsatker.nama] = {}
@@ -180,6 +192,10 @@ class StaffingService(ABC):
         # Create the DataFrame
         # df = pd.DataFrame(data, columns=columns)
         df = pd.DataFrame(columns=columns)
+        sorted_data = sorted(res.items(), key=lambda item: ORDER_DICT.get(item[0].upper(), len(CUSTOM_ORDER)))
+        sorted_data_dict = dict(sorted_data)
+        res = sorted_data_dict
+
         for idx, (satker, levels) in enumerate(res.items(), start=1):
             row = [idx, satker]
             polri_data = []

@@ -1,9 +1,14 @@
+from io import BytesIO
 from django.http import HttpResponse
 from django.db.models import Q
 from django.db import transaction
 from abc import ABC
 
 import pandas as pd
+
+from openpyxl import Workbook
+import xlsxwriter
+
 
 from commons.middlewares.exception import NotFoundException
 from commons.applibs.pagination import pagination
@@ -80,23 +85,63 @@ class UserPersonilService(ABC):
         return serializer
     
     @classmethod
-    def export_csv_file(cls) :
+    def export_csv_file(cls):
         personil_list = UserPersonil.objects.all().order_by("pangkat")
         col = [f.name for f in UserPersonil._meta.get_fields()[3:]]
-    
+
         serializer_data = UserPersonilSerializer(personil_list, many=True).data
         df = pd.DataFrame.from_records(serializer_data, columns=col)
-        
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename=personnel-database.csv'
+        df.insert(0, 'No.', range(1, len(df) + 1))
         
         df.columns = df.columns.str.upper()
-        csv_content = df.to_csv(index=False, sep=';')
         
-        response.write(csv_content)
-    
-        response.write('\n\n')
+        # Convert DataFrame to CSV
+        csv_content = df.to_csv(index=False, sep=';')
 
+        # Create an Excel file in memory using xlsxwriter
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet()
+
+        # Define column widths
+        column_widths = {
+            0: 5,
+            1: 30,
+            2: 10,
+            3: 10,
+            4: 60,
+            5: 10,
+            6: 15,
+            7: 20,
+            8: 20,
+            9: 10
+        }
+
+        # Set column widths
+        for col_num, width in column_widths.items():
+            worksheet.set_column(col_num, col_num, width)
+
+        # Enable text wrapping
+        cell_format = workbook.add_format({ 'valign': 'top'})
+
+        # Write CSV data to the worksheet
+        reader = pd.read_csv(BytesIO(csv_content.encode('utf-8')), sep=';')
+        for row_num, row in enumerate(reader.values):
+            for col_num, cell in enumerate(row):
+                worksheet.write(row_num + 1, col_num, cell, cell_format)
+
+        # Write the header separately with different formatting if needed
+        bold_format = workbook.add_format({'bold': True, 'valign': 'top'})
+
+        for col_num, header in enumerate(reader.columns):
+            worksheet.write(0, col_num, header, bold_format)
+
+        # Close the workbook
+        workbook.close()
+        output.seek(0)
+
+        # Create HTTP response
+        response = HttpResponse(output, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="database-personnel.xlsx"'
+        
         return response
-
-    

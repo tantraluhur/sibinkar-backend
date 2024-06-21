@@ -40,6 +40,7 @@ class UserPersonil(BaseModel) :
         GASUM_MASUK = "Gasum masuk"
         GASUS_KELUAR = "Gasus keluar"
         GASUM_KELUAR = "Gasum keluar"
+        NOT_GASUS = "-"
 
         @classmethod
         def choices(cls):
@@ -47,10 +48,10 @@ class UserPersonil(BaseModel) :
         
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, unique=True)
     nama = models.CharField(max_length=120)
-    jenis_kelamin = models.CharField(max_length=12, choices=JenisKelamin.choices())
-    nrp = models.IntegerField(validators=[MaxValueValidator(99999999)])
     pangkat = models.ForeignKey(Pangkat, on_delete=models.CASCADE)
+    nrp = models.IntegerField(validators=[MaxValueValidator(99999999)])
     jabatan = models.ForeignKey(Jabatan, on_delete=models.CASCADE)
+    jenis_kelamin = models.CharField(max_length=12, choices=JenisKelamin.choices())
     subsatker = models.ForeignKey(SubSatKer, on_delete=models.CASCADE)
     subdit = models.ForeignKey(SubDit, on_delete=models.CASCADE)
     bko = models.CharField(max_length=12, choices=BKO.choices())
