@@ -87,8 +87,7 @@ class UserPersonilService(ABC):
     @classmethod
     def export_csv_file(cls):
         personil_list = UserPersonil.objects.all().order_by("pangkat")
-        col = [f.name for f in UserPersonil._meta.get_fields()[3:]]
-
+        col = [f.name for f in UserPersonil._meta.get_fields()[4:]]
         serializer_data = UserPersonilSerializer(personil_list, many=True).data
         df = pd.DataFrame.from_records(serializer_data, columns=col)
         df.insert(0, 'No.', range(1, len(df) + 1))
@@ -107,14 +106,14 @@ class UserPersonilService(ABC):
         column_widths = {
             0: 5,
             1: 30,
-            2: 10,
-            3: 10,
+            2: 30,
+            3: 20,
             4: 60,
-            5: 10,
-            6: 15,
-            7: 20,
-            8: 20,
-            9: 10
+            5: 20,
+            6: 30,
+            7: 30,
+            8: 30,
+            9: 30
         }
 
         # Set column widths
